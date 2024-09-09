@@ -65,7 +65,7 @@ process variant_calling {
 // Define the workflow
 workflow {
     // Call the first process
-    check_files(name:"Hello") | mapping | variant_calling |  annotations | view { it.trim() }
+    check_files(name:"Hello") | mapping | variant_calling |  annotations | to_elastic | view { it.trim() }
  }
 
 workflow.onComplete {

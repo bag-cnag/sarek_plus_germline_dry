@@ -1,0 +1,6 @@
+{
+    "data":{},
+    "step":"Upload to Elastic Quality Check",
+    "qc_status": "PASS",
+    "qc_status_text": "Data processing successfully completed. QC report created."
+}

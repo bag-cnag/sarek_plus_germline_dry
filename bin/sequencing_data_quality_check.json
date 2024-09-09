@@ -1,0 +1,34 @@
+{
+    "data":{
+"HG002-1_1": {
+						"adapter_content": "PASS",
+						"basic_statistics": "PASS",
+						"per_base_n_content": "PASS",
+						"per_sequence_gc_content": "WARN",
+						"overrepresented_sequences": "PASS",
+						"per_base_sequence_content": "PASS",
+						"per_base_sequence_quality": "PASS",
+						"per_tile_sequence_quality": "PASS",
+						"per_sequence_quality_scores": "PASS",
+						"sequence_duplication_levels": "PASS",
+						"sequence_length_distribution": "PASS"
+					},
+					"HG002-1_2": {
+						"adapter_content": "PASS",
+						"basic_statistics": "PASS",
+						"per_base_n_content": "PASS",
+						"per_sequence_gc_content": "WARN",
+						"overrepresented_sequences": "PASS",
+						"per_base_sequence_content": "PASS",
+						"per_base_sequence_quality": "PASS",
+						"per_tile_sequence_quality": "PASS",
+						"per_sequence_quality_scores": "PASS",
+						"sequence_duplication_levels": "PASS",
+						"sequence_length_distribution": "PASS"
+					}
+
+},
+    "step":"Sequencing data quality check",
+    "qc_status": "PASS",
+    "qc_status_text": "Data processing successfully completed. QC report created."
+}

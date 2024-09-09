@@ -1,0 +1,22 @@
+{
+    "data":
+{
+"SNV_INDELS": {
+						"HG002": {
+							"pass_snps": 3701162,
+							"qc_status": "PASS",
+							"total_snps": 3706915,
+							"pass_indels": 667102,
+							"total_indels": 675681,
+							"pass_snps_status": "PASS",
+							"total_snps_status": "PASS",
+							"pass_indels_status": "PASS",
+							"total_indels_status": "PASS",
+							"insertions_vs_deletion": 0.926212,
+							"insertions_vs_deletion_status": "PASS"
+						}
+					}},
+    "step":"Variant calling quality check",
+    "qc_status": "PASS",
+    "qc_status_text": "Data processing successfully completed. QC report created."
+}

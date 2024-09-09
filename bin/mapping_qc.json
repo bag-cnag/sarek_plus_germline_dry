@@ -1,0 +1,26 @@
+{
+    "data":{
+				"HG002": {
+						"chimeras": 0.011863,
+						"cov_dict": {
+							"1": 99.721,
+							"10": 55.013,
+							"20": 11.725,
+							"30": 11.347,
+							"50": 11.319,
+							"100": 11.308
+						},
+						"evenness": 83.97590771044634,
+						"error_rate": 0.004428,
+						"mean_coverage": 9.612936803952799,
+						"chimeras_status": "PASS",
+						"cov_dict_status": "FAIL",
+						"evenness_status": "PASS",
+						"error_rate_status": "FAIL",
+						"mean_coverage_status": "FAIL"
+					}
+},
+    "step":"Mapping quality check",
+    "qc_status": "PASS",
+    "qc_status_text": "Data processing successfully completed. QC report created."
+}

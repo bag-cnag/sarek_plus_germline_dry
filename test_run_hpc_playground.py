@@ -5,7 +5,7 @@ import os
 from keycloak import KeycloakOpenID
 import pytest
 def pytest_namespace():
-    return {'plan_id': 0 ,"dar_id": None}
+    return {'plan_id': 0 ,"dar_id": None ,  "analysis_type_id":0, "pipeline_id":-1}
 api_host="https://playground.gpapdev.cnag.eu/analysis_service/"
 
 username='test'#os.environ['username']
@@ -23,23 +23,35 @@ token = keycloak_openid.token(username,password )
 
 headers={"Content-Type": "application/json","Authorization":f"Bearer {token['access_token']}", "host":"playground.gpapdev.cnag.eu"}
 
-def pytest_namespace():
-    return {'dar_id': 0}
 #dataload
 #first step generate a csv file out of  something,pipeline,query,etc and then link the data id to the training plan
-dar_data1 = {"analysis_type":"germline",
- "description":"","clinical_referrer":"",
- "clinical_referrer_contact":"","hospital_name":"",
- "priority":"medium","deadline":"2024-09-04",
- "resource_id":1,"pipeline_id":13,
- "tumor_experiment_id":"",
- "control_experiment_id":"HG002"}
 
-pipeline_def={
+
+
+
+def test_get_analysis_type():
+    resp=requests.get(api_host+"/analysis_type/", headers=headers)
+    for analysis in resp.json()['data']:
+        if analysis['name']=='germline':
+           
+           pytest.analysis_type_id= analysis['id']
+           assert True
+
+def test_get_resource():
+    resp=requests.get(api_host+"/resources/", headers=headers)
+    for resource in resp.json()['data']:
+        if resource['name']=='dry':
+           
+           pytest.resource_id= resource['id']
+           assert True
+
+def test_put_pipeline():
+    pipeline_def={
       "analysis_type": "germline",
-      "name": "dry_germline",
+      "analysis_type_id": pytest.analysis_type_id,
+      "name": "dry_germline_plus",
       "data": {
-        "repo": "bag-cnag/sarek_germline_dry",
+        "repo": "bag-cnag/sarek_plus_germline_dry",
         "step": "mapping",
         "steps": [
           {
@@ -73,6 +85,26 @@ pipeline_def={
             "description": ""
           },
           {
+            "step": "Annotations",
+            "step_type": "process",
+            "description": ""
+          },
+          {
+            "step": "Annotations Quality Check",
+            "step_type": "qc",
+            "description": ""
+          },
+          {
+            "step": "Upload to Elastic Quality",
+            "step_type": "process",
+            "description": ""
+          },
+          {
+            "step": "Upload to Elastic Quality Check",
+            "step_type": "qc",
+            "description": ""
+          },
+          {
             "step": "Pipeline completion check",
             "step_type": "process",
             "description": ""
@@ -83,19 +115,38 @@ pipeline_def={
         "pipelines": "sarek,pcgx,annotatesvs,gatk_mt,qualitycontrols"
       },
     }
-
-def put_pipeline():
     #only run whn needed we can not delete it via API
-    resp=requests.put(api_host+"/pipelines/",json=pipeline_def, headers=headers)
+    pytest.pipeline_id = -1
+    resp=requests.get(api_host+"/pipelines/", headers=headers)
+    for pipeline in resp.json():
+        if pipeline['name']=='dry_germline_plus':                   
+           pytest.pipeline_id = pipeline['id']
+
+    if  pytest.pipeline_id == -1:
+            
+            resp=requests.put(api_host+"/pipelines/",json=pipeline_def, headers=headers)
+            pytest.pipeline_id = resp.json()['id']
+    assert (resp.status_code == 200)
+
 
 def test_create_dar():
+    dar_data1 = {"analysis_type":"germline",
+    "analysis_type_id":pytest.analysis_type_id,
+ "description":"","clinical_referrer":"",
+ "clinical_referrer_contact":"","hospital_name":"",
+ "priority":"medium","deadline":"2024-09-04",
+ "resource_id":pytest.resource_id,"pipeline_id":pytest.pipeline_id,
+ "tumor_experiment_id":"",
+ "control_experiment_id":"HG002"}
+
     resp=requests.put(api_host+"/dars/",json=dar_data1, headers=headers)
-    pytest.dar_id=resp.json()['id']
+    pytest.dar_id=resp.json()['dar_id']
     print(pytest.dar_id)
     assert resp.status_code == 201
 
 def test_run_task():
-    resp=requests.post(f"{api_host}/dars/run/{pytest.dar_id}",json={"resource_id":1}, headers=headers)
+    resp=requests.post(f"{api_host}/dars/run/{pytest.dar_id}",json={"resource_id":pytest.resource_id}, headers=headers)
+
     status_array=resp.json()['data'][0]
     if len(status_array[1])==7:
         pytest.task_id=status_array[1]
@@ -127,7 +178,7 @@ def test_run_execution():
 
 def test_check_status_dar():
     resp=requests.get(f"{api_host}/dars/{pytest.dar_id}", headers=headers)
-    assert resp.json()['data'][0]['status']=='review'
+    assert resp.json()['status']=='review'
 
     assert resp.status_code == 200 
 

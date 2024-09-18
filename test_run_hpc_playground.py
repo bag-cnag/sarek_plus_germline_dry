@@ -112,7 +112,21 @@ def test_put_pipeline():
         ],
         "tools": "cnvkit,manta,haplotypecaller,strelka,expansionhunter,stripy,fullmetrics",
         "release": "v0.1",
-        "pipelines": "sarek,pcgx,annotatesvs,gatk_mt,qualitycontrols"
+        "pipelines": "sarek,pcgx,annotatesvs,gatk_mt,qualitycontrols",
+        "output_format":  {
+    "snvs": ["{wd}/results/variant_calling/haplotypecaller/{experiment}/{experiment}.haplotypecaller.filtered.vcf.gz"],
+    "cnvs": ["{wd}/results/annotsv/cnvkit/{experiment}/{experiment}.tsv"],
+    "svs": ["{wd}/results/annotsv/manta/{experiment}/{experiment}.tsv"],
+    "pharmacogenomics": ["{wd}/results/pharmacogenomics/{experiment}/results_gathered_alleles.tsv"],
+    "multiqc": ["{wd}/results/multiqc/multiqc_report.html"],
+    "cram": ["{wd}/results/preprocessing/recalibrated/{experiment}/{experiment}.recal.cram"],
+    "qc_checks": ["{wd}/annotations.json",
+                  "{wd}/elastic.json",
+                  "{wd}/sequencing_data_quality_check.json",
+                  "{wd}/mapping_qc.json",
+                  "{wd}/variant.json",
+                  "{wd}/workflow_complete.json"]
+           }
       },
     }
     #only run whn needed we can not delete it via API
@@ -126,7 +140,7 @@ def test_put_pipeline():
             
             resp=requests.put(api_host+"/pipelines/",json=pipeline_def, headers=headers)
             pytest.pipeline_id = resp.json()['id']
-    assert (resp.status_code == 200)
+    assert (resp.status_code == 200 or  resp.status_code == 201)
 
 
 def test_create_dar():

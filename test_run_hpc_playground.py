@@ -114,19 +114,33 @@ def test_put_pipeline():
         "release": "v0.1",
         "pipelines": "sarek,pcgx,annotatesvs,gatk_mt,qualitycontrols",
         "output_format":  {
-    "snvs": ["{wd}/results/variant_calling/haplotypecaller/{experiment}/{experiment}.haplotypecaller.filtered.vcf.gz"],
-    "cnvs": ["{wd}/results/annotsv/cnvkit/{experiment}/{experiment}.tsv"],
-    "svs": ["{wd}/results/annotsv/manta/{experiment}/{experiment}.tsv"],
-    "pharmacogenomics": ["{wd}/results/pharmacogenomics/{experiment}/results_gathered_alleles.tsv"],
-    "multiqc": ["{wd}/results/multiqc/multiqc_report.html"],
-    "cram": ["{wd}/results/preprocessing/recalibrated/{experiment}/{experiment}.recal.cram"],
-    "qc_checks": ["{wd}/annotations.json",
-                  "{wd}/elastic.json",
-                  "{wd}/sequencing_data_quality_check.json",
-                  "{wd}/mapping_qc.json",
-                  "{wd}/variant.json",
-                  "{wd}/workflow_complete.json"]
-           }
+    "snvs": [{"type": "file",
+              "path": "{wd}/results/variant_calling/haplotypecaller/{experiment}/{experiment}.haplotypecaller.filtered.vcf.gz"},
+             {"type": "index", "index": "cnag_{task_id}"}],
+    "cnvs": [{"type": "file", "path": "{wd}/results/annotsv/cnvkit/{experiment}/{experiment}.tsv"},
+             {"type": "index", "index": "cnag_{task_id}"}],
+    "svs": [{"type": "file", "path": "{wd}/results/annotsv/manta/{experiment}/{experiment}.tsv"},
+            {"type": "index", "index": "cnag_{task_id}"}],
+    "pharmacogenomics": [
+        {"type": "file", "path": "{wd}/results/pharmacogenomics/{experiment}/results_gathered_alleles.tsv"},
+        {"type": "index", "index": "cnag_{task_id}"}],
+    "multiqc": [{"type": "file", "path": "{wd}/results/multiqc/multiqc_report.html"},
+                {"type": "index", "index": "cnag_{task_id}"}],
+    "cram": [{"type": "file", "path": "{wd}/results/preprocessing/recalibrated/{experiment}/{experiment}.recal.cram"},
+             {"type": "index", "index": "cnag_{task_id}"}],
+    "qc_checks": [{"type": "file", "path": "{wd}/annotations.json"},
+                  {"type": "index", "index": "cnag_{task_id}"},
+                  {"type": "file", "path": "{wd}/elastic.json"},
+                  {"type": "index", "index": "cnag_{task_id}"},
+                  {"type": "file", "path": "{wd}/sequencing_data_quality_check.json"},
+                  {"type": "index", "index": "cnag_{task_id}"},
+                  {"type": "file", "path": "{wd}/mapping_qc.json"},
+                  {"type": "index", "index": "cnag_{task_id}"},
+                  {"type": "file", "path": "{wd}/variant.json"},
+                  {"type": "index", "index": "cnag_{task_id}"},
+                  {"type": "file", "path": "{wd}/workflow_complete.json"},
+                  {"type": "index", "index": "cnag_{task_id}"}]
+}
       },
     }
     #only run whn needed we can not delete it via API

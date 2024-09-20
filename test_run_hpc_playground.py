@@ -175,14 +175,7 @@ def test_create_dar():
 def test_run_task():
     resp=requests.post(f"{api_host}/dars/run/{pytest.dar_id}",json={"resource_id":pytest.resource_id}, headers=headers)
 
-    status_array=resp.json()['data'][0]
-    if len(status_array[1])==7:
-        pytest.task_id=status_array[1]
-    elif len(status_array[2])==7:
-        pytest.task_id=status_array[2]
-        
-    else :
-        pytest.task_id=status_array[0]
+    pytest.task_id=resp.json()['task_id']
     print(pytest.task_id)
     assert resp.status_code == 200
 

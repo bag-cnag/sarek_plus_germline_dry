@@ -16,6 +16,9 @@ def is_chrom_not_empty(files, chrom):
     return False
 
 def generateChannelsSOMATIC(config_path):
+    """
+    Function that checks which chromosome files are not empty and generates channels to process them.
+    """
     with open(config_path, "r") as f:
         config = json.load(f)
     files = config['process']['somatic']
@@ -27,6 +30,11 @@ def generateChannelsSOMATIC(config_path):
             else: print(chrom)
 
 def generateChannelsGERMLINE(config_path):
+    """
+    Function that checks if all the files exist and generates the channels.
+    If a file is missing, it will raise an error.
+    If no files are missing, all channels are generated.
+    """
     with open(config_path, "r") as f:
         config = json.load(f)
     experiments = config_file["process"]["experiments_list"]

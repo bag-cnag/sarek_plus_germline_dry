@@ -18,6 +18,9 @@ def parseOpts():
 
     return vars(parser.parse_args())
 
+
+# --------------- CODE TO GENERATE CONFIGS ------------------
+
 def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
     """
     Function to prepare the configs by finding the files in their corresponding directory and creating the needed configs.
@@ -100,6 +103,7 @@ def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
         json.dump(pgx_config, f, indent=4)
 
 
+# --------------- MAIN -----------------
 
 def main(args):
     print("Preparing configs for Amanda+")

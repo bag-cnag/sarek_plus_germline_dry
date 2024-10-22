@@ -4,8 +4,6 @@ nextflow.enable.dsl=2
 // CNV --------------------------------------------------------
 
 process importCNV {
-  cpus 16
-  memory '128 GB'
   tag "Chromosome: $chrom"
   input:
     val chrom
@@ -13,13 +11,11 @@ process importCNV {
     val chrom
   script:
     """
-    /apps/spark-3.*/bin/spark-submit  --driver-memory 128g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline CNV --step 1
+    echo "import CNV"
     """
 }
 
 process exportCNV {
-  cpus 1
-  memory '6 GB'
   executor 'local'
   maxForks = 1
   tag "Chromosome: $chrom"
@@ -29,8 +25,7 @@ process exportCNV {
     val chrom
   script:
     """
-    /apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline CNV --step 2
-    #/apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline CNV --step 3
+    echo "export CNV"
     """
 }
 
@@ -39,8 +34,6 @@ process exportCNV {
 
 
 process importVCF {
-  cpus 20
-  memory '32 GB'
   queue 'scratch'
 
   tag "Import Chromosome: $chrom"
@@ -50,14 +43,14 @@ process importVCF {
     tuple val(chrom), env(sparse_path)
   script:
     """
-    /apps/spark-3.*/bin/spark-submit  --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg  "$params.path"/main.py --config $params.path/snv_config.json --pipeline SNV --assembly $params.assembly --step 0 --chrom $chrom --sparse_path '' 
-    source .command.int_env
+    echo "import VCF $chrom"
+    sparse_path="./${chrom}.sparse"
+    touch sparse_path
+    echo "Sparse file path: $sparse_path"
     """
 }
 
 process annotateVCF {
-  cpus 5
-  memory '64 GB'
 
   tag "Annot Chromosome: $chrom, $sparse_path"
   input:
@@ -67,15 +60,11 @@ process annotateVCF {
     tuple val(chrom), val(sparse_path)
   script:
     """
-    printf $sparse_path
-    /apps/spark-3.*/bin/spark-submit  --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg  "$params.path"/main.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 1 --chrom $chrom --sparse_path $sparse_path  
+    echo "annotate VCF $chrom"
     """
 }
 
 process pushSNV {
-  maxForks = 1
-  cpus 10
-  memory '16 GB'
   //clusterOptions = '-w cnd19'
   errorStrategy 'terminate'
   
@@ -88,7 +77,7 @@ process pushSNV {
 
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 16g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg  "$params.path"/main.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 3 --chrom $chrom --sparse_path $sparse_path  
+    echo "push SNV $chrom"
     """
 }
 
@@ -133,10 +122,6 @@ process updateDM {
 // SOMATIC --------------------------------------------------------
 
 process preprocessSOMATIC {
-  maxForks = 1
-  debug true
-  cpus 20
-  memory '32 GB'
   errorStrategy 'terminate'
  
   tag "Preprocessing SOMATIC Data"
@@ -146,28 +131,23 @@ process preprocessSOMATIC {
     val(empty)
   script:
     """
-    #/apps/spark-3.*/bin/spark-submit  --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 0
-    python3 $params.path/preprocess_somatic.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 0
+    echo "proprocess SOMATIC"
     """
 }
 
 process generateChannels {
-  cpus 1
-  memory '1 GB'
   tag "Define channels"
   input:
     val(empty)
   output:
     stdout
     """
-        python3 $params.path/preprocess_somatic.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 1
+        #python3 $params.path/preprocess_somatic.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 1
+        python3 /home/groups/dat/jdieguez/AMANDA/nftests/mock_generateChannels.py
     """
 }
 
 process annotaONCO {
-  cpus 20
-  memory '32 GB'
-
   tag "Annot OncoClassify Chromosome: $chrom, $sparse_path"
   input:
     tuple val(chrom), val(sparse_path)
@@ -176,8 +156,7 @@ process annotaONCO {
     tuple val(chrom), val(sparse_path)
   script:
     """
-    printf $sparse_path
-    /apps/spark-3.*/bin/spark-submit  --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg  "$params.path"/main.py --config $params.path/snv_config.json --pipeline SOMATIC --assembly $params.assembly --step 2 --chrom $chrom --sparse_path $sparse_path  
+    echo "annotateONCO $chrom"
     """
 }
 
@@ -185,28 +164,20 @@ process annotaONCO {
 
 
 process loadPGX {
-  cpus 16
-  memory '32 GB'
   tag "Load Pharmacogenomics"
   input:
     val ready
   output:
-  path 'pgx_output.ht'
+    path 'pgx_output.ht'
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit \
-      --driver-memory 32g \
-      --py-files /home/groups/dat/lkraatz/pharmacogx/vcfLoader-0.1-py3.11.egg \
-      /home/groups/dat/lkraatz/pharmacogx/repo1/omicsloader/python/drivers/pharmacogx.py \
-      --config $params.path/snv_config.json \
-      --load
+    echo "loadPGX"
+    touch pgx_output.ht
     """
 }
 
 process pushPGX {
-  executor 'local'
-  cpus 16
-  memory '32 GB'
+  memory '1 GB'
   tag "Push Pharmacogenomics"
   input:
   path result_file
@@ -214,20 +185,12 @@ process pushPGX {
   path 'pgx_output.ht'
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit \
-      --driver-memory 32g \
-      --py-files /home/groups/dat/lkraatz/pharmacogx/vcfLoader-0.1-py3.11.egg \
-      /home/groups/dat/lkraatz/pharmacogx/repo1/omicsloader/python/drivers/pharmacogx.py \
-      --config $params.path/snv_config.json \
-      --push \
-      --data $result_file
+    echo "pushPGX"
     """
 }
 
 process updateDMPGX {
-  executor 'local'
-  cpus 16
-  memory '32 GB'
+  memory '1 GB'
   tag "Update DM Pharmacogenomics"
   input:
   path result_file
@@ -235,13 +198,7 @@ process updateDMPGX {
     stdout
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit \
-      --driver-memory 32g \
-      --py-files /home/groups/dat/lkraatz/pharmacogx/vcfLoader-0.1-py3.11.egg \
-      /home/groups/dat/lkraatz/pharmacogx/repo1/omicsloader/python/drivers/pharmacogx.py \
-      --config $params.path/snv_config.json \
-      --update_dm \
-      --index $result_file
+    echo "updateDMPGX"
     """
 }
 
@@ -288,17 +245,15 @@ process uploadS3_gvcfs {
 // PREPARE CONFIG ----------------------------------------
 
 process prepareConfig {
-  cpus 1
-  memory '6 GB'
   tag "Prepare Config"
   input:
-    val chrom
   output:
-    stdout
+    val true
   script:
     """
-    source ~/.bash_profile
-    nice -n 20 python configPreparation.py --task_id $params.task_id --analysis_type $params.analysis_type --working_dir $params.working_dir --experiment_list $params.experiment_list --config_dir $params.config_dir
+    echo "prepare configs"
+    #source ~/.bash_profile
+    #nice -n 20 python configPreparation.py --task_id $params.task_id --analysis_type $params.analysis_type --working_dir $params.working_dir --experiment_list $params.experiment_list --config_dir $params.config_dir
     """
 }
 

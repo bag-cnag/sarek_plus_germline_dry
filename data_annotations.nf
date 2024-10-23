@@ -147,7 +147,7 @@ process preprocessSOMATIC {
   script:
     """
     #/apps/spark-3.*/bin/spark-submit  --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 0
-    python3 $params.path/preprocess_somatic.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 0
+    python3 $params.path/preprocess_files.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 0
     """
 }
 
@@ -160,7 +160,7 @@ process generateChannels {
   output:
     stdout
     """
-        python3 $params.path/preprocess_somatic.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 1
+        python3 $params.path/preprocess_files.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 1
     """
 }
 
@@ -305,6 +305,10 @@ process prepareConfig {
 // PREPROCESS GERMLINE
 
 process preprocessGERMLINE {
+  maxForks = 1
+  debug true
+  cpus 20
+  memory '32 GB'
   errorStrategy 'terminate'
  
   tag "Preprocessing GERMLINE Data"
@@ -314,18 +318,20 @@ process preprocessGERMLINE {
     val(empty)
   script:
     """
-    echo "proprocess GERMLINE"
+    python3 $params.path/preprocess_files.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 0
     """
 }
 
 process generateChannelsGERMLINE {
+  cpus 1
+  memory '1 GB'
   tag "Define channels"
   input:
-    val ready
+    val(empty)
   output:
     stdout
     """
-        python3 /home/groups/dat/jdieguez/AMANDA/nftests/mock_generateChannels.py
+        python3 $params.path/preprocess_files.py --config $params.path/snv_config.json --pipeline $params.pipeline --assembly $params.assembly --step 1
     """
 }
 

@@ -4,31 +4,52 @@ nextflow.enable.dsl=2
 // CNV --------------------------------------------------------
 
 process importCNV {
-  tag "Chromosome: $chrom"
+  tag "Pipeline: $pipeline"
   input:
-    val chrom
+    val pipeline
   output:
-    val chrom
+    val pipeline
   script:
     """
-    echo "import CNV"
+    echo "import CNV $pipeline" 
     """
 }
 
-process exportCNV {
-  executor 'local'
-  maxForks = 1
-  tag "Chromosome: $chrom"
+process pushCNV {
+  tag "Pipeline: $pipeline"
   input:
-    val chrom
+    val pipeline
   output:
-    val chrom
+    val pipeline
   script:
     """
-    echo "export CNV"
+    echo "push CNV $pipeline" 
     """
 }
 
+process updateDMCNV {
+  tag "Pipeline: $pipeline"
+  input:
+    val pipeline
+  output:
+    val pipeline
+  script:
+    """
+    echo "update DM CNV $pipeline" 
+    """
+}
+
+process generateChannelsCNV {
+  tag "Define channels"
+  input:
+    val ready
+  output:
+    stdout
+    """
+        echo 'CNV'
+        echo 'SV'
+    """
+}
 
 // SNV --------------------------------------------------------
 
@@ -294,12 +315,14 @@ workflow {
 
         // SNV
         preprocessGERMLINE(prepareConfig.out)
-        python_output = generateChannelsGERMLINE(preprocessGERMLINE.out) // HACER EL MISMO PERO PARA GERMLINE
+        python_output = generateChannelsGERMLINE(preprocessGERMLINE.out)
         channels = python_output.map{line -> line.trim().split("\n")}.flatten()
         channels | importVCF | annotateVCF | pushSNV
 
         // CNV
-        prepareConfig.out | importCNV | exportCNV
+        python_output_cnv = generateChannelsCNV(prepareConfig.out)
+        channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
+        channels_cnv | importCNV | pushCNV | updateDMCNV | view
 
         // PGX
         prepareConfig.out | loadPGX | pushPGX //| updateDMPGX
@@ -315,7 +338,9 @@ workflow {
         channels | annotateVCF | annotaONCO | pushSNV
 
         // CNV
-        prepareConfig.out | importCNV | exportCNV
+        python_output_cnv = generateChannelsCNV(prepareConfig.out)
+        channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
+        channels_cnv | importCNV | pushCNV | updateDMCNV | view
     }
 
 }

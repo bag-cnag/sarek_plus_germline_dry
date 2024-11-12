@@ -6,34 +6,48 @@ nextflow.enable.dsl=2
 process importCNV {
   cpus 16
   memory '128 GB'
-  tag "Chromosome: $chrom"
+  tag "Pipeline: $pipeline"
   input:
-    val chrom
+    val pipeline
   output:
-    val chrom
+    val pipeline
   script:
     """
-    /apps/spark-3.*/bin/spark-submit  --driver-memory 128g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline CNV --step 1
+    /apps/spark-3.*/bin/spark-submit  --driver-memory 128g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline $pipeline --step 1
     """
 }
 
-process exportCNV {
+process pushCNV {
   cpus 1
   memory '6 GB'
   executor 'local'
   maxForks = 1
-  tag "Chromosome: $chrom"
+  tag "Pipeline: $pipeline"
   input:
-    val chrom
+    val pipeline
   output:
-    val chrom
+    val pipeline
   script:
     """
-    /apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline CNV --step 2
-    #/apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline CNV --step 3
+    /apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline $pipeline --step 2
     """
 }
 
+process updateDMCNV {
+  cpus 1
+  memory '6 GB'
+  executor 'local'
+  maxForks = 1
+  tag "Pipeline: $pipeline"
+  input:
+    val pipeline
+  output:
+    val pipeline
+  script:
+    """
+    /apps/spark-3.*/bin/spark-submit --master local[4] --driver-memory 32g --py-files "$params.path"/vcfLoader-0.1-py3.11.egg "$params.path"/main.py --config "$params.path"/cnv_config.json --assembly $params.assembly --pipeline $pipeline --step 3
+    """
+}
 
 // SNV --------------------------------------------------------
 

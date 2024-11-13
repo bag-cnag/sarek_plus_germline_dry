@@ -364,8 +364,9 @@ process generateChannelsCNV {
 // --------------------------------------------------------
 
 workflow {
-
+    params.assembly = '38'
     if (params.analysis_type == 'germline') {
+        params.pipeline = "SNV"
         prepareConfig()
 
         // SNV
@@ -384,6 +385,7 @@ workflow {
     }
 
     if (params.analysis_type == 'tumor_only' || params.analysis_type == 'tumor_normal') {
+        params.pipeline = "SOMATIC"
         prepareConfig()
 
         // SNV

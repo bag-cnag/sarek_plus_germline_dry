@@ -349,6 +349,17 @@ process generateChannelsGERMLINE {
     """
 }
 
+process generateChannelsCNV {
+  tag "Define channels"
+  input:
+    val ready
+  output:
+    stdout
+    """
+        python3 /home/groups/dat/jdieguez/AMANDA/nftests/mock_generateChannels.py
+    """
+}
+
 
 // --------------------------------------------------------
 
@@ -359,12 +370,14 @@ workflow {
 
         // SNV
         preprocessGERMLINE(prepareConfig.out)
-        python_output = generateChannelsGERMLINE(preprocessGERMLINE.out) // HACER EL MISMO PERO PARA GERMLINE
+        python_output = generateChannelsGERMLINE(preprocessGERMLINE.out)
         channels = python_output.map{line -> line.trim().split("\n")}.flatten()
         channels | importVCF | annotateVCF | pushSNV
 
         // CNV
-        prepareConfig.out | importCNV | exportCNV
+        python_output_cnv = generateChannelsCNV(prepareConfig.out)
+        channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
+        channels_cnv | importCNV | pushCNV | updateDMCNV | view
 
         // PGX
         prepareConfig.out | loadPGX | pushPGX //| updateDMPGX
@@ -380,7 +393,9 @@ workflow {
         channels | annotateVCF | annotaONCO | pushSNV
 
         // CNV
-        prepareConfig.out | importCNV | exportCNV
+        python_output_cnv = generateChannelsCNV(prepareConfig.out)
+        channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
+        channels_cnv | importCNV | pushCNV | updateDMCNV | view
     }
 
 }

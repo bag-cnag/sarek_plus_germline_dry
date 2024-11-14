@@ -121,7 +121,7 @@ def main(args):
     else:
         raise Exception(f"Wrong experiment_list: {experiment_list}")
 
-    prepareConfigs(task_id, analysis_type, wd, experiment, config_dir)
+    prepareConfigs(task_id, analysis_type, working_dir, experiment, config_dir)
 
 if __name__ == "__main__":
     args = parseOpts()

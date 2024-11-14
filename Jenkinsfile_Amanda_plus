@@ -6,6 +6,7 @@ pipeline {
         string(name: 'TASK_ID', defaultValue: 'test')
         string(name: 'EXPERIMENT_LIST', defaultValue: 'HCC1395BL')
         extendedChoice(description: 'Analysis type', multiSelectDelimiter: ',', name: 'ANALYSIS_TYPE', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_RADIO', value: 'germline, tumor_nromal, tumor_only', visibleItemCount: 3, defaultValue: 'germline')
+        booleanParam(name: 'RUN', defaultValue: true)
     }
 
     environment {
@@ -20,6 +21,9 @@ pipeline {
         }
 
         stage('Execution') {
+            when {
+                expression {env.RUN.toBoolean()}
+            }
             steps {
                 withCredentials([file(credentialsId: 'joel_ssh_file2', variable: 'id_hpc')]) {
                     sh '''

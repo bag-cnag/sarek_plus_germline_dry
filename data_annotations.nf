@@ -298,24 +298,6 @@ process uploadS3_gvcfs {
     """
 }
 
-
-// PREPARE CONFIG ----------------------------------------
-
-process prepareConfig {
-  cpus 1
-  memory '6 GB'
-  tag "Prepare Config"
-  input:
-    val chrom
-  output:
-    stdout
-  script:
-    """
-    source ~/.bash_profile
-    nice -n 20 python configPreparation.py --task_id $params.task_id --analysis_type $params.analysis_type --working_dir $params.working_dir --experiment_list $params.experiment_list --config_dir $params.config_dir
-    """
-}
-
 // PREPROCESS GERMLINE
 
 process preprocessGERMLINE {
@@ -357,6 +339,22 @@ process generateChannelsCNV {
     stdout
     """
         python3 /home/groups/dat/jdieguez/AMANDA/nftests/mock_generateChannels.py
+    """
+}
+
+// PREPARE CONFIG ----------------------------------------
+
+process prepareConfig {
+  cpus 1
+  memory '6 GB'
+  tag "Prepare Config"
+  input:
+  output:
+    stdout
+  script:
+    """
+    source ~/.bash_profile
+    nice -n 20 python configPreparation.py --task_id $params.task_id --analysis_type $params.analysis_type --working_dir $params.working_dir --experiment_list $params.experiment_list --config_dir $params.config_dir
     """
 }
 

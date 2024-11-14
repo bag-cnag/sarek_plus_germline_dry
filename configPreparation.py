@@ -111,7 +111,7 @@ def main(args):
     task_id = args['task_id']
     analysis_type = args['analysis_type']
     working_dir = args['working_dir']
-    experiment_list = args['experiment_list']
+    experiment_list = args['experiment_list'].split(',')
     config_dir = args['config_dir']
 
     if len(experiment_list) == 1:

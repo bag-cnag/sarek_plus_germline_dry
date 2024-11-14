@@ -4,7 +4,7 @@ pipeline {
     parameters {
         //string(name: 'Int_Freq_tool', description: 'To select only one tool', defaultValue: 'CONTROLFREEC_20000')
         string(name: 'TASK_ID', defaultValue: 'test')
-        booleanParam(name: 'EXPERIMENT_LIST', defaultValue: 'HCC1395BL')
+        string(name: 'EXPERIMENT_LIST', defaultValue: 'HCC1395BL')
         extendedChoice(description: 'Analysis type', multiSelectDelimiter: ',', name: 'ANALYSIS_TYPE', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_RADIO', value: 'germline, tumor_nromal, tumor_only', visibleItemCount: 3, defaultValue: 'germline')
     }
 

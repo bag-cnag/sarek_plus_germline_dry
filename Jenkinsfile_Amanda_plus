@@ -11,7 +11,7 @@ pipeline {
 
     environment {
         HPC_DIRECTORY = '/home/groups/dat/jdieguez/AMANDA/work_dir'
-        ANALYSIS_TYPE = params.ANALYSIS_TYPE
+        ANALYSIS_TYPE = "${params.ANALYSIS_TYPE}"
     }
 
     stages {

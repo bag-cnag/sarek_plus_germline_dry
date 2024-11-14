@@ -11,6 +11,7 @@ pipeline {
 
     environment {
         HPC_DIRECTORY = '/home/groups/dat/jdieguez/AMANDA/work_dir'
+        ANALYSIS_TYPE = params.ANALYSIS_TYPE
     }
 
     stages {
@@ -24,11 +25,11 @@ pipeline {
             steps {
                 script {
                     if (!params.RUN) {
-                        params.ANALYSIS_TYPE = ''
+                        ANALYSIS_TYPE = ''
                         echo "RUN = False -> Do not run any pipeline."
                     }
                 }
-                echo "Selected ANALYSIS_TYPE: ${params.ANALYSIS_TYPE}"
+                echo "Selected ANALYSIS_TYPE: ${ANALYSIS_TYPE}"
             }
         }
 

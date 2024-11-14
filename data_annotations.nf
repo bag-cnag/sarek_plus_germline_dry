@@ -354,7 +354,7 @@ process prepareConfig {
   script:
     """
     source ~/.bash_profile
-    nice -n 20 python configPreparation.py --task_id $params.task_id --analysis_type $params.analysis_type --working_dir $params.working_dir --experiment_list $params.experiment_list --config_dir $params.config_dir
+    nice -n 20 python $params.path/configPreparation.py --task_id $params.task_id --analysis_type $params.analysis_type --working_dir $params.working_dir --experiment_list $params.experiment_list --config_dir $params.config_dir
     """
 }
 

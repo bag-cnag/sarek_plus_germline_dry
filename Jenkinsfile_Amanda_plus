@@ -5,8 +5,7 @@ pipeline {
         //string(name: 'Int_Freq_tool', description: 'To select only one tool', defaultValue: 'CONTROLFREEC_20000')
         string(name: 'TASK_ID', defaultValue: 'test')
         string(name: 'EXPERIMENT_LIST', defaultValue: 'HCC1395BL')
-        extendedChoice(description: 'Analysis type', multiSelectDelimiter: ',', name: 'ANALYSIS_TYPE', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_RADIO', value: 'germline, tumor_nromal, tumor_only', visibleItemCount: 3, defaultValue: 'germline')
-        booleanParam(name: 'RUN', defaultValue: true)
+        extendedChoice(description: 'Analysis type', multiSelectDelimiter: ',', name: 'ANALYSIS_TYPE', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_RADIO', value: 'germline, tumor_nromal, tumor_only, None', visibleItemCount: 4, defaultValue: 'germline')
     }
 
     environment {
@@ -18,18 +17,6 @@ pipeline {
         stage('Checkout Omicsloader repo') {
             steps {
                 git(url: 'https://github.com/bag-cnag/sarek_plus_germline_dry.git', branch: 'amanda_plus_tests', credentialsId: 'joel_github_3')
-            }
-        }
-
-        stage('Run?') {
-            steps {
-                script {
-                    if (!params.RUN) {
-                        ANALYSIS_TYPE = ''
-                        echo "RUN = False -> Do not run any pipeline."
-                    }
-                }
-                echo "Selected ANALYSIS_TYPE: ${ANALYSIS_TYPE}"
             }
         }
 

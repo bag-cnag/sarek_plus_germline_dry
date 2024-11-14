@@ -28,7 +28,7 @@ pipeline {
                                                                 module use /software/dat/modules/all;
                                                                 module load Nextflow/22.10.1;
                                                                 cd ${HPC_DIRECTORY};
-                                                                nextflow run spark_config/data_annotations.nf -c spark_config/nextflow.config --path ${HPC_DIRECTORY}/spark_config -with-report ${HPC_DIRECTORY}/report.html --analysis_type ${ANALYSIS_TYPE} --task_id ${TASK_ID} --working_dir $params.working_dir --experiment_list ${EXPERIMENT_LIST} --config_dir ${HPC_DIRECTORY}/spark_config
+                                                                nextflow run spark_config/data_annotations.nf -c spark_config/nextflow.config --path ${HPC_DIRECTORY}/spark_config -with-report ${HPC_DIRECTORY}/report.html --analysis_type ${ANALYSIS_TYPE} --task_id ${TASK_ID} --working_dir ${HPC_DIRECTORY} --experiment_list ${EXPERIMENT_LIST} --config_dir ${HPC_DIRECTORY}/spark_config
                                                                 "
                        '''
                 }

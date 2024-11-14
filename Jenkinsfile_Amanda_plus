@@ -33,6 +33,19 @@ pipeline {
             }
         }
 
+        stage('Update files') {
+            steps {
+                withCredentials([file(credentialsId: 'joel_ssh_file2', variable: 'id_hpc')]) {
+                    sh '''
+                        ls
+                        scp -p -r -P 2222 -i $id_hpc data_annotations.nf jdieguez@login7.hpc.cnag.eu:${HPC_DIRECTORY}/spark_config/
+                        scp -p -r -P 2222 -i $id_hpc nextflow.config jdieguez@login7.hpc.cnag.eu:${HPC_DIRECTORY}/spark_config/
+                        scp -p -r -P 2222 -i $id_hpc configPreparation.py jdieguez@login7.hpc.cnag.eu:${HPC_DIRECTORY}/spark_config/
+                       '''
+                }
+            }
+        }
+
         stage('Execution') {
             //when {
             //    expression {env.RUN.toBoolean()}

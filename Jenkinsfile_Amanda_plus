@@ -23,7 +23,7 @@ pipeline {
         stage('Run?') {
             steps {
                 script {
-                    if !(params.RUN) {
+                    if (!params.RUN) {
                         params.ANALYSIS_TYPE = ''
                         echo "RUN = False -> Do not run any pipeline."
                     }

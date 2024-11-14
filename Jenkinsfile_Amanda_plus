@@ -20,10 +20,22 @@ pipeline {
             }
         }
 
-        stage('Execution') {
-            when {
-                expression {env.RUN.toBoolean()}
+        stage('Run?') {
+            steps {
+                script {
+                    if !(params.RUN) {
+                        params.ANALYSIS_TYPE = ''
+                        echo "RUN = False -> Do not run any pipeline."
+                    }
+                }
+                echo "Selected ANALYSIS_TYPE: ${params.ANALYSIS_TYPE}"
             }
+        }
+
+        stage('Execution') {
+            //when {
+            //    expression {env.RUN.toBoolean()}
+            //}
             steps {
                 withCredentials([file(credentialsId: 'joel_ssh_file2', variable: 'id_hpc')]) {
                     sh '''

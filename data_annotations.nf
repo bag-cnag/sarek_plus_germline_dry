@@ -212,7 +212,7 @@ process loadPGX {
       --driver-memory 32g \
       --py-files "$params.path"/vcfLoader-0.1-py3.11.egg \
       "$params.path"/pharmacogx.py \
-      --config "$params.path"/snv_config.json \
+      --config "$params.path"/pgx_config.json \
       --load
     """
 }
@@ -232,7 +232,7 @@ process pushPGX {
       --driver-memory 32g \
       --py-files "$params.path"/vcfLoader-0.1-py3.11.egg \
       "$params.path"/pharmacogx.py \
-      --config "$params.path"/snv_config.json \
+      --config "$params.path"/pgx_config.json \
       --push \
       --data $result_file
     """
@@ -253,7 +253,7 @@ process updateDMPGX {
       --driver-memory 32g \
       --py-files "$params.path"/vcfLoader-0.1-py3.11.egg \
       "$params.path"/pharmacogx.py \
-      --config "$params.path"/snv_config.json \
+      --config "$params.path"/pgx_config.json \
       --update_dm \
       --index $index_file
     """

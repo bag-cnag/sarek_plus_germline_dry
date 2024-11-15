@@ -52,4 +52,17 @@ pipeline {
             }
         }
     }
+
+        post {
+        always {
+            withCredentials([file(credentialsId: 'joel_ssh_file2', variable: 'id_hpc')]) {
+                sh '''
+                    scp -p -r -P 2222 -i $id_hpc jdieguez@login7.hpc.cnag.eu:${HPC_DIRECTORY}/spark_config/ .
+                    '''
+            }
+            archiveArtifacts artifacts: 'cnv_config.json'
+            archiveArtifacts artifacts: 'snv_config.json'
+            archiveArtifacts artifacts: 'pgx_config.json'
+        }
+    }
 }

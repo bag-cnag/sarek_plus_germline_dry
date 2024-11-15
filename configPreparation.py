@@ -4,6 +4,7 @@ import argparse
 import sys
 import os
 import csv
+import copy
 
 
 # USAGE SECTION ---------------------------------------------------------------

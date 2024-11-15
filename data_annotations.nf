@@ -377,7 +377,7 @@ workflow {
         // CNV
         python_output_cnv = generateChannelsCNV(prepareConfig.out)
         channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
-        channels_cnv | importCNV | pushCNV | updateDMCNV | view
+        channels_cnv | importCNV | pushCNV //| updateDMCNV | view
 
         // PGX
         prepareConfig.out | loadPGX | pushPGX //| updateDMPGX
@@ -395,7 +395,7 @@ workflow {
         // CNV
         python_output_cnv = generateChannelsCNV(prepareConfig.out)
         channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
-        channels_cnv | importCNV | pushCNV | updateDMCNV | view
+        channels_cnv | importCNV | pushCNV //| updateDMCNV | view
     }
 
 }

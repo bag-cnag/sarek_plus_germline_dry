@@ -208,31 +208,31 @@ process loadPGX {
   path 'pgx_output.ht'
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit \
+    nice -n 20 /apps/spark-3.1.1-bin-hadoop3.2/bin/spark-submit \
       --driver-memory 32g \
-      --py-files /home/groups/dat/lkraatz/pharmacogx/vcfLoader-0.1-py3.11.egg \
-      /home/groups/dat/lkraatz/pharmacogx/repo1/omicsloader/python/drivers/pharmacogx.py \
-      --config $params.path/snv_config.json \
+      --py-files "$params.path"/vcfLoader-0.1-py3.11.egg \
+      "$params.path"/pharmacogx.py \
+      --config "$params.path"/snv_config.json \
       --load
     """
 }
 
 process pushPGX {
   executor 'local'
-  cpus 16
-  memory '32 GB'
+  cpus 1
+  memory '6 GB'
   tag "Push Pharmacogenomics"
   input:
   path result_file
   output:
-  path 'pgx_output.ht'
+  path result_file
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit \
+    nice -n 20 /apps/spark-3.1.1-bin-hadoop3.2/bin/spark-submit \
       --driver-memory 32g \
-      --py-files /home/groups/dat/lkraatz/pharmacogx/vcfLoader-0.1-py3.11.egg \
-      /home/groups/dat/lkraatz/pharmacogx/repo1/omicsloader/python/drivers/pharmacogx.py \
-      --config $params.path/snv_config.json \
+      --py-files "$params.path"/vcfLoader-0.1-py3.11.egg \
+      "$params.path"/pharmacogx.py \
+      --config "$params.path"/snv_config.json \
       --push \
       --data $result_file
     """
@@ -240,22 +240,22 @@ process pushPGX {
 
 process updateDMPGX {
   executor 'local'
-  cpus 16
-  memory '32 GB'
+  cpus 1
+  memory '6 GB'
   tag "Update DM Pharmacogenomics"
   input:
-  path result_file
+  path index_file
   output:
     stdout
   script:
     """
-    nice -n 20 /apps/spark-3.*/bin/spark-submit \
+    nice -n 20 /apps/spark-3.1.1-bin-hadoop3.2/bin/spark-submit \
       --driver-memory 32g \
-      --py-files /home/groups/dat/lkraatz/pharmacogx/vcfLoader-0.1-py3.11.egg \
-      /home/groups/dat/lkraatz/pharmacogx/repo1/omicsloader/python/drivers/pharmacogx.py \
-      --config $params.path/snv_config.json \
+      --py-files "$params.path"/vcfLoader-0.1-py3.11.egg \
+      "$params.path"/pharmacogx.py \
+      --config "$params.path"/snv_config.json \
       --update_dm \
-      --index $result_file
+      --index $index_file
     """
 }
 

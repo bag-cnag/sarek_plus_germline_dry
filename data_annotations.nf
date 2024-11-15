@@ -363,9 +363,10 @@ process prepareConfig {
 
 workflow {
     params.assembly = '38'
+    prepareConfig()
+
     if (params.analysis_type == 'germline') {
         params.pipeline = "SNV"
-        prepareConfig()
 
         // SNV
         preprocessGERMLINE(prepareConfig.out)
@@ -384,7 +385,6 @@ workflow {
 
     if (params.analysis_type == 'tumor_only' || params.analysis_type == 'tumor_normal') {
         params.pipeline = "SOMATIC"
-        prepareConfig()
 
         // SNV
         preprocessSOMATIC(prepareConfig.out)

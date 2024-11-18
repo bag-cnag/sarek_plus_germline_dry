@@ -338,7 +338,8 @@ process generateChannelsCNV {
   output:
     stdout
     """
-        python3 /home/groups/dat/jdieguez/AMANDA/nftests/mock_generateChannels.py
+        echo 'CNV'
+        echo 'SV'
     """
 }
 

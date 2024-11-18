@@ -372,15 +372,15 @@ workflow {
         preprocessGERMLINE(prepareConfig.out)
         python_output = generateChannelsGERMLINE(preprocessGERMLINE.out)
         channels = python_output.map{line -> line.trim().split("\n")}.flatten()
-        channels | importVCF | annotateVCF | pushSNV
+        channels | importVCF | annotateVCF //| pushSNV
 
         // CNV
         python_output_cnv = generateChannelsCNV(prepareConfig.out)
         channels_cnv = python_output_cnv.map{line -> line.trim().split("\n")}.flatten()
-        channels_cnv | importCNV | pushCNV //| updateDMCNV | view
+        channels_cnv | importCNV //| pushCNV //| updateDMCNV | view
 
         // PGX
-        prepareConfig.out | loadPGX | pushPGX //| updateDMPGX
+        prepareConfig.out | loadPGX //| pushPGX //| updateDMPGX
     }
 
     if (params.analysis_type == 'tumor_only' || params.analysis_type == 'tumor_normal') {

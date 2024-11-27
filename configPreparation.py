@@ -38,12 +38,19 @@ def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
     config["process"]["destination_path"] = destination_path
     config["process"]["source_path"] = source_path
 
+    # ES instance
+    es_ins = config["resources"]["elasticsearch"]["main_project"]
+    if es_ins == "playground":
+        es_prefix = "play"
+    else:
+        es_prefix = "cnag"
+
     # Define SNV: 
     if analysis_type == 'germline':
         # Pipeline: germline
         snv_config = copy.deepcopy(config)
         snv_path = [f"{wd}/results/variant_calling/haplotypecaller/{experiment}/{experiment}.haplotypecaller.filtered.vcf.gz"]
-        snv_index = f"cnag_snv_{task_id}"
+        snv_index = f"{es_prefix}_snv_{task_id}"
         dense_path = os.path.join(destination_path, "denseMatrix")
         sparse_path = os.path.join(destination_path, "sparseMatrix/0.0.0")
         snv_config["process"]["experiments_list"] = snv_path
@@ -56,8 +63,8 @@ def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
         snv_config = copy.deepcopy(config)
         mutect_path = f"{wd}/results/variant_calling/mutect2/{experiment}/{experiment}.mutect2.filtered.vcf.gz"
         exps = {'mutect': mutect_path}
-        es_index = f"cnag_to_{task_id}"
-        es_biomarkers = f"cnag_biom_{task_id}"
+        es_index = f"{es_prefix}_to_{task_id}"
+        es_biomarkers = f"{es_prefix}_biom_{task_id}"
         snv_config["process"]["somatic_without_pre"] = exps
         snv_config["resources"]["elasticsearch"]["index_name"] = es_index
         snv_config["resources"]["elasticsearch"]["biomarkers_index"] = es_biomarkers
@@ -69,8 +76,8 @@ def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
         strelka_snv = f"{wd}/results/variant_calling/strelka/{experiment}/{experiment}.strelka.somatic_snvs.vcf.gz"
         strelka_indels = f"{wd}/results/variant_calling/strelka/{experiment}/{experiment}.strelka.somatic_indels.vcf.gz"
         exps = {'mutect': mutect_path}
-        es_index = f"cnag_tn_{task_id}"
-        es_biomarkers = f"cnag_biom_{task_id}"
+        es_index = f"{es_prefix}_tn_{task_id}"
+        es_biomarkers = f"{es_prefix}_biom_{task_id}"
         snv_config["process"]["somatic_without_pre"] = exps
         snv_config["resources"]["elasticsearch"]["index_name"] = es_index
         snv_config["resources"]["elasticsearch"]["biomarkers_index"] = es_biomarkers
@@ -84,7 +91,7 @@ def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
     sv_path = f"{wd}/results/annotsv/manta/{experiment}/{experiment}.tsv"
     exps = [[experiment, cnv_path, "CNVKIT"],
             [experiment, sv_path, "MANTA"]]
-    cnv_index = f"cnag_cnv_{task_id}"
+    cnv_index = f"{es_prefix}_cnv_{task_id}"
     cnv_config["process"]["experiments_list"] = exps
     cnv_config["resources"]["elasticsearch"]["index_name"] = cnv_index
 
@@ -95,7 +102,7 @@ def prepareConfigs(task_id, analysis_type, wd, experiment, config_dir):
     pgx_config = copy.deepcopy(config)
     pgx_source_path = f"{wd}/results/pharmacogenomics/{experiment}/results_gathered_alleles.tsv"
     experiment_list = [experiment]
-    index_name_pgx = f"cnag_pgx_{task_id}"
+    index_name_pgx = f"{es_prefix}_pgx_{task_id}"
     pgx_config["process"]["pgx_source_path"] = pgx_source_path
     pgx_config["process"]["experiments_list"] = experiment_list
     pgx_config["resources"]["elasticsearch"]["index_name_pgx"] = index_name_pgx
